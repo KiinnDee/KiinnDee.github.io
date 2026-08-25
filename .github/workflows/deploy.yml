@@ -5,7 +5,6 @@ on:
     branches: [master]
   workflow_dispatch:
 
-# 设置环境变量，强制本次工作流中的所有 JavaScript Action 使用 Node.js 24 运行时
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -16,7 +15,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository using git
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
@@ -28,8 +27,7 @@ jobs:
           node-version: "24"
           cache: "pnpm"
 
-      # 关键点：显式安装 pnpm，并确保它被添加到 PATH
-      - name: Install pnpm
+      - name: Install pnpm globally
         run: |
           npm install -g pnpm@latest
           echo "$(npm prefix -g)/bin" >> $GITHUB_PATH

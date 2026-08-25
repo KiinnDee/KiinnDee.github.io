@@ -25,12 +25,11 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          # 注意：此处不开启 cache，由后续 pnpm 缓存管理
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          # 不指定 version，自动读取 package.json 中的 packageManager 字段
           run_install: false
 
       - name: Install dependencies

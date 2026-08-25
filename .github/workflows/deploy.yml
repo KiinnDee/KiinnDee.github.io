@@ -17,25 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout your repository using git
-        # 升级到 v4 的最新版本，确保兼容 Node.js 24
         uses: actions/checkout@v4
         with:
           submodules: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
-        # 升级到支持 Node.js 24 的 v6 版本[reference:10]
         uses: actions/setup-node@v6
         with:
-          # 明确指定使用 Node.js 24[reference:11][reference:12]
           node-version: "24"
-          cache: "pnpm" # 启用 pnpm 缓存加速安装
+          cache: "pnpm"
 
-      - name: Setup pnpm
-        # 升级到支持 Node.js 24 的 v6 版本[reference:13][reference:14]
-        uses: pnpm/action-setup@v6
-        with:
-          run_install: false
+      # 关键点：显式安装 pnpm，并确保它被添加到 PATH
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm@latest
+          echo "$(npm prefix -g)/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

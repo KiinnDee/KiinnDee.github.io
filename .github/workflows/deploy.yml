@@ -1,33 +1,51 @@
-name: Deploy to Github Pages
+name: Deploy to Pages Branch
+
 on:
-  # 每次推送到 master 分支时自动触发
   push:
     branches: [master]
-  # 允许在 Github Action 手动触发
   workflow_dispatch:
 
-# 权限设置
+# 设置环境变量，强制本次工作流中的所有 JavaScript Action 使用 Node.js 24 运行时
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository
+      - name: Checkout your repository using git
+        # 升级到 v4 的最新版本，确保兼容 Node.js 24
         uses: actions/checkout@v4
-      # 使用 Astro 官方动作，它会自动识别 pnpm-lock.yaml 并使用 pnpm 安装依赖
-      - name: Install, build, and upload your site
-        uses: withastro/action@v2
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        # 升级到支持 Node.js 24 的 v6 版本[reference:10]
+        uses: actions/setup-node@v6
+        with:
+          # 明确指定使用 Node.js 24[reference:11][reference:12]
+          node-version: "24"
+          cache: "pnpm" # 启用 pnpm 缓存加速安装
+
+      - name: Setup pnpm
+        # 升级到支持 Node.js 24 的 v6 版本[reference:13][reference:14]
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build site
+        run: pnpm run build
+
+      - name: Deploy to pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: pages
+          folder: dist
+          clean: true

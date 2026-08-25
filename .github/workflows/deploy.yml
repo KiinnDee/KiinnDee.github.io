@@ -5,11 +5,11 @@ on:
     branches: [master]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 permissions:
   contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-deploy:
@@ -25,12 +25,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "pnpm"
+          # 注意：此处不开启 cache，由后续 pnpm 缓存管理
 
-      - name: Install pnpm globally
-        run: |
-          npm install -g pnpm@latest
-          echo "$(npm prefix -g)/bin" >> $GITHUB_PATH
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

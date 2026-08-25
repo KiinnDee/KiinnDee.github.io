@@ -233,7 +233,7 @@ export const siteConfig: SiteConfig = {
     quality: 85, // 图片质量，推荐 70-85
     noReferrerDomains: [
       // 需要添加 referrerpolicy="no-referrer" 的域名（支持通配符）
-      "*.hdslb.com", // Bilibili CDN
+      "*.hdslb.com", // Bilibili CDN..
     ],
   },
 };
